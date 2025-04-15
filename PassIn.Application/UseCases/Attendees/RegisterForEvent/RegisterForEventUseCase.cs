@@ -5,7 +5,7 @@ using PassIn.Exceptions;
 using PassIn.Infrastructure;
 using PassIn.Infrastructure.Entities;
 
-namespace PassIn.Application.UseCases.Events.RegisterForEvent;
+namespace PassIn.Application.UseCases.Attendees.RegisterForEvent;
 
 public class RegisterForEventUseCase
 {
@@ -36,7 +36,7 @@ public class RegisterForEventUseCase
             Id = entity.Id,
         };
     }
-    
+
     private void Validate(Guid eventId, RequestRegisterEventJson request)
     {
         var eventEntity = _dbContext.Events.Find(eventId);
@@ -57,19 +57,19 @@ public class RegisterForEventUseCase
         {
             throw new ErrorOnValidationException("Invalid e-mail.");
         }
-        
+
         var isAttendeeAlreadyRegistered = _dbContext
             .Attendees
             .Any(attendee => attendee.Email.Equals(request.Email) && attendee.Event_Id == eventId);
-    
+
         if (isAttendeeAlreadyRegistered)
         {
             throw new ConflictException("You cannot register twice for the same event.");
         }
 
         var eventAttendeesCount = _dbContext.Attendees.Count(attendee => attendee.Event_Id == eventId);
-    
-        if(eventAttendeesCount == eventEntity.Maximum_Attendees)
+
+        if (eventAttendeesCount == eventEntity.Maximum_Attendees)
         {
             throw new ErrorOnValidationException("Maximum attendees reached.");
         }
